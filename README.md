@@ -7,4 +7,4 @@
     "dbfs:/FileStore/tables/case_ifood/order-2.csv"
     "dbfs:/FileStore/tables/case_ifood/restaurant.csv"
     "dbfs:/FileStore/tables/case_ifood/ab_test_ref.csv"
-    "dbfs:/FileStore/tables/case_ifood/consumer_.csv"
+    "dbfs:/FileStore/tables/case_ifood/consumer_.csv" 
