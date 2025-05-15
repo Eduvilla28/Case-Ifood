@@ -8,15 +8,12 @@
 
 from pyspark.sql import SparkSession
 
-# Iniciar a Spark Session (com suporte a Hive se necessário)
 spark = SparkSession.builder \
     .appName("CSV to Spark Table") \
     .getOrCreate()
 
-# Caminho para o arquivo CSV
 csv_path = "dbfs:/FileStore/tables/case_ifood/order-2.csv"
 
-# Ler o CSV
 order_df = spark.read.option("header", "true").option("inferSchema", "true").option("sep", ";").csv(csv_path)
 
 display(order_df)
@@ -291,18 +288,15 @@ plt.show()
 
 # COMMAND ----------
 
-# Garantir que os campos necessários não tenham nulos
+
 df_limp = sample_df.dropna(subset=['customer_id', 'order_id', 'is_target'])
 
-# Padronizar grupo se necessário
 df_limp['is_target'] = df_limp['is_target'].astype(str).str.lower()
 df_limp['grupo'] = df_limp['is_target'].map({'0': 'Control', '1': 'Target', 'control': 'Control', 'target': 'Target'})
 
-# Contar clientes únicos que fizeram pedidos por grupo
 clientes_com_pedido = df_limp.groupby('grupo')['customer_id'].nunique().reset_index()
 clientes_com_pedido.columns = ['Grupo', 'Clientes Únicos com Pedido']
 
-# Exibir
 print(clientes_com_pedido)
 
 # COMMAND ----------
@@ -311,7 +305,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Agrupamento
+
 agrupado = sample_df.groupby('is_target').agg(
     qtd_clientes=('customer_id', pd.Series.nunique),
     valor_total=('order_total_amount', 'sum')
@@ -328,11 +322,9 @@ width = 0.35
 
 fig, ax = plt.subplots(figsize=(8, 5))
 
-# Cores: cinza para clientes, vermelho para valor
 bars1 = ax.bar(x - width/2, qtd_clientes, width, label='Qtd. de Clientes', color='gray')
 bars2 = ax.bar(x + width/2, valor_total_mil, width, label='Valor Total (mil R$)', color='red')
 
-# Eixos e rótulos
 ax.set_xlabel('Grupo')
 ax.set_ylabel('Valores')
 ax.set_title('Clientes e Valor Total por Grupo (Control vs Target)')
@@ -340,7 +332,6 @@ ax.set_xticks(x)
 ax.set_xticklabels(labels)
 ax.legend()
 
-# Rótulos no topo
 for bar in bars1 + bars2:
     yval = bar.get_height()
     ax.text(bar.get_x() + bar.get_width()/2, yval, f'{yval:,.0f}', ha='center', va='bottom')
@@ -351,22 +342,18 @@ plt.show()
 
 # COMMAND ----------
 
-# Limpar dados
+
 df_limp = sample_df.dropna(subset=['is_target', 'order_id', 'order_total_amount'])
 
-# Agrupamento por grupo com pedidos únicos
 df_perf = df_limp.groupby('is_target').agg(
     pedidos_unicos=('order_id', 'nunique'),
     valor_total=('order_total_amount', 'sum')
 ).reset_index()
 
-# Calcular ticket médio com base em pedidos únicos
 df_perf['ticket_medio'] = df_perf['valor_total'] / df_perf['pedidos_unicos']
 
-# Mapear nomes dos grupos se necessário
 df_perf['grupo'] = df_perf['is_target'].map({'target': 'Target', 'control': 'Control'})
 
-# Exibir resultado
 print(df_perf[['grupo', 'pedidos_unicos', 'valor_total', 'ticket_medio']])
 
 # COMMAND ----------
@@ -377,7 +364,6 @@ df_estado = df_limp.groupby(['delivery_address_state', 'is_target']).agg(
     clientes=('customer_id', 'nunique')
 ).reset_index()  
 
-# ticket médio
 df_estado['ticket_medio'] = df_estado['valor_total'] / df_estado['qtd_pedidos']
 
 df_estado['grupo'] = df_estado['is_target'].map({'control': 'Control', 'target': 'Target'})
