@@ -74,7 +74,7 @@ spark = SparkSession.builder \
     .appName("CSV to Spark Table") \
     .getOrCreate()
 
-csv_cons = "dbfs:/FileStore/tables/consumer_.csv"
+csv_cons = "dbfs:/FileStore/tables/case_ifood/consumer_.csv"
 
 consumer_df = spark.read.option("header", "true").option("inferSchema", "true").csv(csv_cons)
 
